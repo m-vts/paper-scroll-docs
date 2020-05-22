@@ -5,9 +5,30 @@ HOST: https://paper-scroll.ru/api/
 
 Здесь представлен список доступных секций и методов API игры [Paper Scroll](https://vk.com/app7420483).
 
-Любые вопросы вы можете задать в нашем [сообществе ВКонтакте](https://vk.com/paper_scroll) или [специальной беседе](https://vk.me/join/AJQ1d4PhyRd9VqY5MOofYEWD).
+Любые вопросы о работе API вы можете задать в нашем [сообществе ВКонтакте](https://vk.com/paper_scroll) или [специальной беседе](https://vk.me/join/AJQ1d4PhyRd9VqY5MOofYEWD).
 
-Для работы с API вам необходимо создать магазин внутри приложения и получить к нему ключ доступа по ссылке [vk.com/app7420483#create_merchant](https://vk.com/app7420483#create_merchant)
+Для отправки запросов вам необходимо создать магазин внутри приложения и получить к нему ключ доступа по ссылке [vk.com/app7420483#create_merchant](https://vk.com/app7420483#create_merchant)
+
+### Limitations
+
+С использованием одного ключа доступа можно отправить не больше 3 запросов в секунду. 
+
+Также с одного IP адреса в секунду можно отправить не больше 10 запросов в секунду.
+
+### Errors handling
+
+Возвращаемые API ошибки всегда имеют общий формат:
+
+```
+{
+    "error": {
+        "error_code": 1,
+        "error_msg": "Internal error",
+        "error_text": "Внутренняя ошибка сервиса, повторите запрос позже"
+    }
+}
+```
+
 
 # Merchants [/merchants]
 
