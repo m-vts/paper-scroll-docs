@@ -1,80 +1,88 @@
-FORMAT: 1A
+FORMAT: 1A9
 HOST: https://paper-scroll.ru/api/
 
 # paper-scroll
 
-Polls is a simple API allowing consumers to view polls and vote in them.
+Здесь представлен список доступных секций и методов API игры [Paper Scroll](https://vk.com/app7420483).
 
-## Questions Collection [/questions]
+Любые вопросы вы можете задать в нашем [сообществе ВКонтакте](https://vk.com/paper_scroll) или [специальной беседе](https://vk.me/join/AJQ1d4PhyRd9VqY5MOofYEWD).
 
-### List All Questions [GET]
+Для работы с API вам необходимо создать магазин внутри приложения и получить для него ключ доступа по ссылке [vk.com/app7420483#create_merchant](https://vk.com/app7420483#create_merchant)
 
-+ Response 200 (application/json)
+# Merchants [/merchants]
 
-        [
-            {
-                "question": "Favourite programming language?",
-                "published_at": "2015-08-05T08:40:51.620Z",
-                "choices": [
-                    {
-                        "choice": "Swift",
-                        "votes": 2048
-                    }, {
-                        "choice": "Python",
-                        "votes": 1024
-                    }, {
-                        "choice": "Objective-C",
-                        "votes": 512
-                    }, {
-                        "choice": "Ruby",
-                        "votes": 256
-                    }
-                ]
-            }
-        ]
-
-### Create a New Question [POST]
-
-You may create your own question using this action. It takes a JSON
-object containing a question and a collection of answers in the
-form of choices.
+## merchants.get [GET /merchants.get]
+    Возвращает информацию о магазинах по их идентификаторам 
 
 + Request (application/json)
 
-        {
-            "question": "Favourite programming language?",
-            "choices": [
-                "Swift",
-                "Python",
-                "Objective-C",
-                "Ruby"
-            ]
-        }
+    + Attributes
 
-+ Response 201 (application/json)
-
-    + Headers
-
-            Location: /questions/2
-
+        + merchant_ids (array[number], optional) 
+            ID магазинов, перечисленные через запятую. <br/>
+            По умолчанию — идентификатор текущего магазина.
+        
     + Body
 
             {
-                "question": "Favourite programming language?",
-                "published_at": "2015-08-05T08:40:51.620Z",
-                "choices": [
-                    {
-                        "choice": "Swift",
-                        "votes": 0
-                    }, {
-                        "choice": "Python",
-                        "votes": 0
-                    }, {
-                        "choice": "Objective-C",
-                        "votes": 0
-                    }, {
-                        "choice": "Ruby",
-                        "votes": 0
-                    }
-                ]
+                "merchant_ids": [1]
             }
+            
++ Response 200 (application/json)
+    + Attributes (object)
+        + response (array[Merchant]) - Список магазинов
+    
+
+# Users [/users]
+
+# Transfers [/transfers]
+
+# Data Structures
+
+## Merchant (object)
++ merchant_id: `1`, `2`, `3` (number) - ID магазина
++ owner_id: 595626484 (number) - ID владельца магазина
++ name: `Мой магазин` (string) - Название магазина
++ balance: 250000 (number) - Баланс магазина в тыс. долях рулонов
++ create_date: 1590134400 (number) - Дата создания магазина
+
+## User (object)
++ user_id: 595626484 (number) - ID пользователя
++ first_name, last_name: `Pi Emerollo` (string) - Имя и Фамилия пользователя
++ avatar, avatar_max: `https://pp.userapi.com/...` - Фотографии из профиля пользователя
++ balance: 100000 (number) - Баланс пользователя в тыс. долях рулонов
+
+## Transfer (object)
++ transfer_id: 37356 (number) - ID перевода
++ user_id: 595626484 (number) - ID инициатора перевода
++ peer_id: 100772411 (number) - ID получателя перевода
++ external_id: 37357 (number) - ID перевода для получателя
++ is_initiator: true (boolean) - Является ли текущий пользователь инициатором
+
++ type (enum[string])
+    Тип перевода
+
+    + Default: `transfer`
+    + Members
+        + `transfer` - Стандартный перевод
+        + `merchant` - Перевод для магазина
+        + `steal` - Кража другим пользователем (user-only)
+        + `loss` - Потеря от заражения (user-only)
+        + `achievement` - Бонус за полученное достижение (user-only)
+
++ object_type (enum[string])
+    Тип переводимых предметов
+
+    + Default: `balance`
+    + Members
+        + `balance` - Рулоны
+        + `disinfectants` - Средства защиты
+        + `items` - Предметы из инвентаря
+
++ object_type_id: 1 (number) 
+    ID предмета при **object_type** = **disinfectants** или  **items**
+
++ amount: 1000 (number) 
+
+    Переводимая сумма при **object_type** = **balance** <br/>
+    В остальных случаях - количество переводимых предметов
