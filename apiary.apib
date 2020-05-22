@@ -14,7 +14,7 @@ HOST: https://paper-scroll.ru/api/
 Данные запросов и ответов передаются в формате JSON в кодировке UTF-8. <br/>
 Базовый адрес для отправки запросов: https://paper-scroll.ru/api/{method}
 
-К каждому отправляемому запросу необходимо добавлять заголовок `Authorization` с типом `Basic` и base64-закдированной строкой `merchant_id:access_token` (не пропустите двоеточие между двумя строками).
+К каждому отправляемому запросу необходимо добавлять заголовок `Authorization` с типом `Basic` и base64-закодированной строкой `merchant_id:access_token` (не пропустите двоеточие между двумя строками).
 
 Например: `Authorization: Basic MjozNTJlYTIyMTZlZDEzYmZhMDlhNTk0ZQ==`
  
@@ -88,7 +88,7 @@ HOST: https://paper-scroll.ru/api/
 + Request (application/json)
 
     + Attributes
-        + merchant_ids: (array[number], optional) 
+        + merchant_ids: 1 (array[number], optional) 
             ID магазинов, не больше 100 элементов. <br/>
             По умолчанию — идентификатор текущего магазина.
         
