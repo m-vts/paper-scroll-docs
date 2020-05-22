@@ -49,18 +49,46 @@ HOST: https://paper-scroll.ru/api/
 
 Также в ходе выполнения могут произойти специальные ошибки, уникальные для каждого запрашиваемого метода.
 
+### Callback
 
-# Merchants [/merchants.get]
+С помощью метода `callbacks.create` вы можете настроить отправку уведомлений о получении новых переводов на собственный сервер.<br/>
+Данные отправляются методом `POST` в формате `application/json`.
 
-## /merchants.get [GET]
+На данный момент поддерживаются события: `transfer_new`.
+
+Пример отправляемого события:
+```
+{
+    "type": "transfer_new",
+    "object": {
+        "transfer_id": 37356,
+        "user_id": 595626484,
+        "peer_id": 100772411,
+        "external_id": 37357,
+        "is_initiator": true,
+        "type": "merchant",
+        "object_type": "balance",
+        "object_type_id": 0,
+        "amount": 1000,
+        "create_date": 1590134400
+    },
+    "secret": "yQ7Z1LDDG83Q8r8Ym9Yu2aXzBc51T06Q"
+}
+```
+
+Событие считается успешно отправленным, если ответ сервера содержит HTTP код `200 OK`.<br/>
+При ошибке событие будет отправлено на сервер ещё раз через 30 секунд.
+
+# Merchants [/merchants]
+
+## /merchants.get [POST]
 
 Возвращает информацию о магазинах по их идентификаторам
 
 + Request (application/json)
 
     + Attributes
-
-        + merchant_ids (array[number], optional) 
+        + merchant_ids: (array[number], optional) 
             ID магазинов, не больше 100 элементов. <br/>
             По умолчанию — идентификатор текущего магазина.
         
@@ -81,7 +109,6 @@ HOST: https://paper-scroll.ru/api/
 + Request (application/json)
 
     + Attributes
-            
         + name (string, optional) 
             Новое название магазина
             
@@ -91,12 +118,13 @@ HOST: https://paper-scroll.ru/api/
         + avatar (string, optional) 
             Ссылка на новое изображение магазина <br/>
             Должно быть загружено на сервер ВКонтакте и иметь адрес формата `https://pp.userapi.com/******.jpg`
-        
+            
     + Body
 
             {
                 "name": "Мой магазин",
-                "avatar": "https://pp.userapi.com/aYxZDDg1UmaxPa_hFL-eCWlGO3oDuJou4z6ZIg/Z6AEvIhxwjI.jpg"
+                "group_id": 194441652,
+                "avatar": "https://pp.userapi.com/..../Z6AEvIhxwjI.jpg"
             }
             
 + Response 200 (application/json)
@@ -109,10 +137,71 @@ HOST: https://paper-scroll.ru/api/
                 "response": true
             }
 
+# Callbacks [/callbacks]
 
-# Users [/users.get]
+## /callbacks.create [POST]
 
-## /users.get [GET]
+Создает Callback сервер для отправки уведомлений о событиях 
+
++ Request (application/json)
+
+    + Attributes
+        + url (string, required) 
+            URL для отправки уведомлений
+            
+        + events (array[string], required)
+            Типы отправляемых событий на сервер
+            
+    + Body
+
+            {
+                "url": "https://example.com/callback",
+                "events": ["transfer_new"]
+            }
+            
++ Response 200 (application/json)
+    + Attributes (object)
+        + response (Callback) - Объект созданного сервера
+            
+## /callbacks.delete [POST]
+
+Удялает текущий используемый сервер 
+
++ Request (application/json)
+
++ Response 200 (application/json)
+    + Attributes (object)
+        + response: true (boolean) - Результат выполнения запроса
+        
+    + Body
+
+            {
+                "response": true
+            }
+            
+## /callbacks.getLogs [POST]
+
+Возвращает информацию о последних 20 ошибках при отправке событий
+
++ Request (application/json)
+            
++ Response 200 (application/json)
+    + Attributes (object)
+        + response: [] (array[string]) - Результат выполнения запроса
+        
+    + Body
+
+            {
+                "response": [
+                    "22.05.2019 11:44:20 — 404 Not found",
+                    "22.05.2019 11:44:22 — 404 Not found"
+                ]
+            }
+            
+
+# Users [/users]
+
+## /users.get [POST]
 
 Возвращает информацию о пользователях по их идентификаторам
 
@@ -126,7 +215,7 @@ HOST: https://paper-scroll.ru/api/
     + Body
 
             {
-                "user_ids": [1]
+                "user_ids": [595626484]
             }
             
 + Response 200 (application/json)
@@ -166,13 +255,17 @@ HOST: https://paper-scroll.ru/api/
 
     + Attributes
 
-        + peer_id (number, required) - ID получателя
+        + peer_id (number, required) - ID получателя перевода
         + object_type (enum[string], required) - Тип переводимых предметов
         
             + Members
                 + `balance` - Рулоны
                 + `disinfectants` - Средства защиты
                 + `items` - Предметы из инвентаря
+                
+        + object_type_id (number) 
+            При **object_type** = **disinfectants** или **items** содержит ID предмета <br/>
+            При **object_type** = **balance** всегда имеет значение `0`
         
         
         + amount (number) 
@@ -182,8 +275,9 @@ HOST: https://paper-scroll.ru/api/
     + Body
 
             {
-                "user_ids": [1],
+                "peer_id": 100772411,
                 "object_type": "balance",
+                "object_type_id": 0,
                 "amount": 1000
             }
             
@@ -191,9 +285,9 @@ HOST: https://paper-scroll.ru/api/
     + Attributes (object)
         + response (Transfer) - Объект созданного перевода
 
-## /transfers.get [GET]
+## /transfers.get [POST]
 
-Возвращает информацию о переводах по их идентификаторам
+Возвращает список переводов по их идентификаторам
 
 + Request (application/json)
 
@@ -201,14 +295,6 @@ HOST: https://paper-scroll.ru/api/
         + transfer_ids (array[number], required) 
             ID переводов, не больше 100 элементов.<br/>
             Если перевод не пренадлежит текущему пользователю или ещё не создан, то объекта с его данными в массиве не будет.
-        
-        + filter (enum[string], optional) - Фильтр 
-            
-            + Default: `all`
-        
-            + Members
-                + `incoming` - Только входящие переводы
-                + `outcoming` - Только исходящие переводы
         
     + Body
 
@@ -220,15 +306,13 @@ HOST: https://paper-scroll.ru/api/
     + Attributes (object)
         + response (array[Transfer]) - Список запрошенных переводов
 
-## /transfers.getHistory [GET]
+## /transfers.getHistory [POST]
 
-Возвращает информацию о последних переводах
+Возвращает список последних переводов
 
 + Request (application/json)
 
     + Attributes
-        + offset: 0 (number, optional) - Смещение относительно первого найденного перевода
-        
         + filter: `all` (enum[string], optional) - Фильтр по типу переводов
             + Default: `all`
             
@@ -236,11 +320,17 @@ HOST: https://paper-scroll.ru/api/
                 + `all` - Все переводы
                 + `incoming` - Только входящие переводы
                 + `outcoming` - Только исходящие переводы
+                
+        + offset: 0 (number, optional) - Смещение относительно первого найденного перевода
+        
+        + limit: 100 (number, optional) - Количество возвращаемых переводов, не больше 250 элементов.
         
     + Body
 
             {
-                "transfer_ids": [1]
+                "filter": "all",
+                "offfset": 0,
+                "limit": 250
             }
             
 + Response 200 (application/json)
@@ -263,7 +353,7 @@ HOST: https://paper-scroll.ru/api/
 + name: `Мой магазин` (string, required)
     Название магазина
     
-+ avatar: `https://pp.userapi.com/...` (string, required)
++ avatar: `https://pp.userapi.com/aYxZDDg1UmaxPa_hFL-eCWlGO3oDuJou4z6ZIg/Z6AEvIhxwjI.jpg` (string, required)
     Изображение магазина
     
 + balance: 250000 (number, required)
@@ -276,11 +366,17 @@ HOST: https://paper-scroll.ru/api/
 + user_id: 595626484 (number, required) 
     ID пользователя
     
-+ first_name, last_name: `Pi Emerollo` (string, required) 
-    Имя и Фамилия пользователя
++ first_name: `Pi Emerollo` (string, required) 
+    Имя пользователя
     
-+ avatar, avatar_max: `https://pp.userapi.com/...` (string, required)
-    Фотографии из профиля пользователя
++ last_name: `Emerollo` (string, required)
+    Фамилия пользователя
+    
++ avatar: `https://pp.userapi.com/.../yaoqoZbLB08.jpg` (string, required)
+    URL квадратной фотографии пользователя размером 50x50 или 100x100 пикселей
+    
++ avatar_max: `https://pp.userapi.com/.../yaoqoZbLB08.jpg` (string, required)
+    URL квадратной фотографии пользователя размером 200x200 или 400x400 пикселей
     
 + balance: 100000 (number, required)
     Баланс пользователя в тыс. долях рулонов
@@ -309,18 +405,18 @@ HOST: https://paper-scroll.ru/api/
 + is_initiator: true (boolean, required)
     Является ли текущий пользователь инициатором
     
-+ type (enum[string])
++ type (enum[string], required)
     Тип перевода
 
     + Default: `transfer`
     + Members
-        + `merchant` - Перевод от/для магазина
+        + `merchant` - Перевод от/в магазин
         + `transfer` - Стандартный перевод между пользователями (user-only)
         + `steal` - Кража другим пользователем (user-only)
         + `loss` - Потеря от заражения (user-only)
         + `achievement` - Бонус за полученное достижение (user-only)
 
-+ object_type (enum[string])
++ object_type (enum[string], required)
     Тип переводимых предметов
 
     + Default: `balance`
@@ -329,13 +425,28 @@ HOST: https://paper-scroll.ru/api/
         + `disinfectants` - Средства защиты
         + `items` - Предметы из инвентаря
 
-+ object_type_id: 1 (number) 
++ object_type_id: 0 (number, required) 
     При **object_type** = **disinfectants** или **items** содержит ID предмета <br/>
     При **object_type** = **balance** всегда имеет значение `0`
 
-+ amount: 1000 (number) 
++ amount: 1000 (number, required) 
     Переводимая сумма в тыс. долях при **object_type** = **balance** <br/>
     В остальных случаях - количество переводимых предметов
+
++ create_date: 1590134400 (number, required)
+    Дата отправки перевода
+
+## Callback (object)
++ callback_id: 1 (number, required)
+    ID сервера
++ merchant_id: 1 (number, required)
+    ID магазина, которым используется сервер
++ events: transfer_new (array[enum[string]], required)
+    Типы отправляемых событий на сервер
++ secret: `yQ7Z1LDDG83Q8r8Ym9Yu2aXzBc51T06Q` (string, required) 
+    Секретный ключ, отправляемый вместе с запросами
++ create_date: 1590134400 (number, required)
+    Дата создания сервера
 
 ## Error (object)
 + error_code: 1 (string, required)
