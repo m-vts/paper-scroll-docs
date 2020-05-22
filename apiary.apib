@@ -17,7 +17,7 @@ HOST: https://paper-scroll.ru/api/
 
 ### Errors handling
 
-Возвращаемые API ошибки всегда имеют общий формат:
+Ошибки API всегда возвращаются с HTTP кодом 400 Bad Request и имеют общий формат:
 
 ```
 {
@@ -29,14 +29,21 @@ HOST: https://paper-scroll.ru/api/
 }
 ```
 
+Основной список ошибок, возвращаемых для всех методов:
+
+- **#1 - Internal error** (Внутренняя ошибка сервиса)
+- **#2 - Authorize error** (Неверно передан ключ доступа)
+- **#3 - Access error** (Ошибка доступа к секции/методу)
+- **#4 - Flood limit** (Превышен лимит на частоту обращений)
+- **#5 - Unknown method** (Не определена секция/метод API)
+
+Также в ходе выполнения могут произойти специальные ошибки, уникальные для каждого метода.
 
 # Merchants [/merchants]
 
-## merchants.get [GET /merchants.get]
-    Возвращает информацию о магазинах по их идентификаторам 
+## merchants.get [GET /merchants.get] - Возвращает информацию о магазинах по их идентификаторам 
 
 + Request (application/json)
-
     + Attributes
 
         + merchant_ids (array[number], optional) 
@@ -53,7 +60,9 @@ HOST: https://paper-scroll.ru/api/
 + Response 200 (application/json)
     + Attributes (object)
         + response (array[Merchant]) - Список магазинов
-    
+        
++ Response 400 (application/json)
+    + Attributes (Error)
 
 # Users [/users]
 
@@ -61,18 +70,18 @@ HOST: https://paper-scroll.ru/api/
 
 # Data Structures
 
+## User (object)
++ user_id: 595626484 (number) - ID пользователя
++ first_name, last_name: `Pi Emerollo` (string) - Имя и Фамилия пользователя
++ avatar, avatar_max: `https://pp.userapi.com/...` - Фотографии из профиля пользователя
++ balance: 100000 (number) - Баланс пользователя в тыс. долях рулонов
+
 ## Merchant (object)
 + merchant_id: `1`, `2`, `3` (number) - ID магазина
 + owner_id: 595626484 (number) - ID владельца магазина
 + name: `Мой магазин` (string) - Название магазина
 + balance: 250000 (number) - Баланс магазина в тыс. долях рулонов
 + create_date: 1590134400 (number) - Дата создания магазина
-
-## User (object)
-+ user_id: 595626484 (number) - ID пользователя
-+ first_name, last_name: `Pi Emerollo` (string) - Имя и Фамилия пользователя
-+ avatar, avatar_max: `https://pp.userapi.com/...` - Фотографии из профиля пользователя
-+ balance: 100000 (number) - Баланс пользователя в тыс. долях рулонов
 
 ## Transfer (object)
 + transfer_id: 37356 (number) - ID перевода
@@ -102,9 +111,15 @@ HOST: https://paper-scroll.ru/api/
         + `items` - Предметы из инвентаря
 
 + object_type_id: 1 (number) 
-    ID предмета при **object_type** = **disinfectants** или  **items**
+    При **object_type** = **disinfectants** или **items** содержит ID предмета <br/>
+    При **object_type** = **balance** всегда имеет значение `0`
 
 + amount: 1000 (number) 
 
     Переводимая сумма при **object_type** = **balance** <br/>
     В остальных случаях - количество переводимых предметов
+    
+## Error (object)
++ error_code: 1 (required, string)
++ error_msg: `Example error` (required, string)
++ error_text: `Error message example` (required, string)
