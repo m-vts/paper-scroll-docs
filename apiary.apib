@@ -13,7 +13,7 @@ HOST: https://paper-scroll.ru/api/
 
 С использованием одного ключа доступа можно отправить не больше 3 запросов в секунду. 
 
-Также с одного IP адреса в секунду можно отправить не больше 10 запросов в секунду.
+Также для каждого IP адреса имеется лимит на 10 запросов в секунду.
 
 ### Errors handling
 
@@ -36,20 +36,23 @@ HOST: https://paper-scroll.ru/api/
 - **#3 - Access error** (Ошибка доступа к секции/методу)
 - **#4 - Flood limit** (Превышен лимит на частоту обращений)
 - **#5 - Unknown method** (Не определена секция/метод API)
+- **#6 - Invalid params** <br/> (Неверно переданы параметры к запросу.<br/>Возвращается, если для метода не опредлены собственные типы ошибок.)
 
-Также в ходе выполнения могут произойти специальные ошибки, уникальные для каждого метода.
+Также в ходе выполнения могут произойти специальные ошибки, уникальные для каждого запрашиваемого метода.
 
-# Merchants [/merchants]
 
-## merchants.get [GET /merchants.get] - Возвращает информацию о магазинах по их идентификаторам 
+# Merchants [/merchants.get]
+
+## /merchants.get [GET]
+
+Возвращает информацию о магазинах по их идентификаторам
 
 + Request (application/json)
     + Attributes
 
         + merchant_ids (array[number], optional) 
-            ID магазинов, перечисленные через запятую. <br/>
-            По умолчанию — идентификатор текущего магазина. <br/>
-            Не больше 100 элементов.
+            ID магазинов, не больше 100 элементов. <br/>
+            По умолчанию — идентификатор текущего магазина.
         
     + Body
 
@@ -59,44 +62,173 @@ HOST: https://paper-scroll.ru/api/
             
 + Response 200 (application/json)
     + Attributes (object)
-        + response (array[Merchant]) - Список магазинов
-        
-+ Response 400 (application/json)
-    + Attributes (Error)
+        + response (array[Merchant]) - Список запрошенных магазинов
 
-# Users [/users]
+## /merchants.edit [POST]
+
+Редактирует информацию о текущем магазине
+
++ Request (application/json)
+    + Attributes
+            
+        + name (string, optional) 
+            Новое название магазина
+            
+        + group_id (number, optional) 
+            ID сообщества ВКонтакте, к которому будет привязан магазин
+            
+        + avatar (string, optional) 
+            Ссылка на новое изображение магазина <br/>
+            Должно быть загружено на сервер ВКонтакте и иметь адрес формата `https://pp.userapi.com/******.jpg`
+        
+    + Body
+
+            {
+                "name": "Мой магазин",
+                "avatar": "https://pp.userapi.com/aYxZDDg1UmaxPa_hFL-eCWlGO3oDuJou4z6ZIg/Z6AEvIhxwjI.jpg"
+            }
+            
++ Response 200 (application/json)
+    + Attributes (object)
+        + response: true (boolean) - Статус выполнения запроса
+        
+    + Body
+
+            {
+                "response": true
+            }
+
+# Users [/users.get]
+
+## /users.get [GET]
+
+Возвращает информацию о пользователях по их идентификаторам
+
++ Request (application/json)
+    + Attributes
+
+        + user_ids (array[number], optional) 
+            ID пользователей, не больше 100 элементов
+        
+    + Body
+
+            {
+                "user_ids": [1]
+            }
+            
++ Response 200 (application/json)
+    + Attributes (object)
+        + response (array[User]) - Список запрошенных профилей пользователей
+
+## /users.getBalances [GET]
+
+Возвращает информацию о балансах пользователей по их идентификаторам
+
++ Request (application/json)
+    + Attributes
+
+        + user_ids (array[number], optional) 
+            ID пользователей, не больше 250 элементов
+        
+    + Body
+
+            {
+                "user_ids": [595626484]
+            }
+            
++ Response 200 (application/json)
+    + Attributes (object)
+        + response (array[UserBalance])
+        
+            Список запрошенных балансов пользователей. <br/>
+            Если профиль пользователя ещё не был создан в профиле, то объекта с его данными в массиве не будет.
+
 
 # Transfers [/transfers]
+
+## /transfers.create [POST]
+
+Запускает выполнение нового перевода
+
++ Request (application/json)
+    + Attributes
+
+        + user_ids (array[number], optional) 
+            ID пользователей, не больше 100 элементов.
+        
+    + Body
+
+            {
+                "user_ids": [1]
+            }
+            
++ Response 200 (application/json)
+    + Attributes (object)
+        + response (array[User]) - Список запрошенных профилей пользователей
 
 # Data Structures
 
 ## User (object)
-+ user_id: 595626484 (number) - ID пользователя
-+ first_name, last_name: `Pi Emerollo` (string) - Имя и Фамилия пользователя
-+ avatar, avatar_max: `https://pp.userapi.com/...` - Фотографии из профиля пользователя
-+ balance: 100000 (number) - Баланс пользователя в тыс. долях рулонов
++ user_id: 595626484 (number, required) 
+    ID пользователя
+    
++ first_name, last_name: `Pi Emerollo` (string, required) 
+    Имя и Фамилия пользователя
+    
++ avatar, avatar_max: `https://pp.userapi.com/...` (string, required)
+    Фотографии из профиля пользователя
+    
++ balance: 100000 (number, required)
+    Баланс пользователя в тыс. долях рулонов
+    
++ improvements_sum: 1000 (number, required)
+    Сумма улучшений в тыс. долях рулонов
+    
++ bonuses_sum: 250 (number, required) 
+    Сумма бонусов в тыс. долях
+
 
 ## Merchant (object)
-+ merchant_id: `1`, `2`, `3` (number) - ID магазина
-+ owner_id: 595626484 (number) - ID владельца магазина
-+ name: `Мой магазин` (string) - Название магазина
-+ balance: 250000 (number) - Баланс магазина в тыс. долях рулонов
-+ create_date: 1590134400 (number) - Дата создания магазина
++ merchant_id: `1`, `2`, `3` (number, required)
+    ID магазина
+    
++ owner_id: 595626484 (number, required)
+    ID владельца магазина
+    
++ group_id: 194441652 (number, required)
+    ID сообщества ВКонтакте, к которому будет привязан магазин
+    
++ name: `Мой магазин` (string, required)
+    Название магазина
+    
++ avatar: `https://pp.userapi.com/...` (string, required)
+    Изображение магазина
+    
++ balance: 250000 (number, required)
+    Баланс магазина в тыс. долях рулонов
+    
++ create_date: 1590134400 (number, required)
+    Дата создания магазина
 
 ## Transfer (object)
-+ transfer_id: 37356 (number) - ID перевода
-+ user_id: 595626484 (number) - ID инициатора перевода
-+ peer_id: 100772411 (number) - ID получателя перевода
-+ external_id: 37357 (number) - ID перевода для получателя
-+ is_initiator: true (boolean) - Является ли текущий пользователь инициатором
++ transfer_id: 37356 (number, required)
+    ID перевода
++ user_id: 595626484 (number, required)
+    ID инициатора перевода
++ peer_id: 100772411 (number, required)
+    ID получателя перевода
++ external_id: 37357 (number, required)
+    ID перевода для получателя
++ is_initiator: true (boolean, required)
+    Является ли текущий пользователь инициатором
 
 + type (enum[string])
     Тип перевода
 
     + Default: `transfer`
     + Members
-        + `transfer` - Стандартный перевод
-        + `merchant` - Перевод для магазина
+        + `merchant` - Перевод от/для магазина
+        + `transfer` - Стандартный перевод между пользователями (user-only)
         + `steal` - Кража другим пользователем (user-only)
         + `loss` - Потеря от заражения (user-only)
         + `achievement` - Бонус за полученное достижение (user-only)
@@ -116,10 +248,19 @@ HOST: https://paper-scroll.ru/api/
 
 + amount: 1000 (number) 
 
-    Переводимая сумма при **object_type** = **balance** <br/>
+    Переводимая сумма в тыс. долях при **object_type** = **balance** <br/>
     В остальных случаях - количество переводимых предметов
     
+## UserBalance (object)
++ user_id: 595626484 (number, required)
+    ID пользователя
++ balance: 100000 (number, required)
+    Баланс пользователя в тыс. долях рулонов
+    
 ## Error (object)
-+ error_code: 1 (required, string)
-+ error_msg: `Example error` (required, string)
-+ error_text: `Error message example` (required, string)
++ error_code: 1 (string, required)
+    Код ошибки
++ error_msg: `Example error` (string, required)
+    Название типа ошибки
++ error_text: `Error message example` (string, required)
+    Подробное описание проблемы
