@@ -1,4 +1,4 @@
-FORMAT: 1A9
+FORMAT: 1A
 HOST: https://paper-scroll.ru/api/
 
 # paper-scroll
@@ -9,6 +9,15 @@ HOST: https://paper-scroll.ru/api/
 
 Для отправки запросов вам необходимо создать магазин внутри приложения и получить к нему ключ доступа по ссылке [vk.com/app7420483#create_merchant](https://vk.com/app7420483#create_merchant)
 
+### Requests sending
+
+Данные запросов и ответов передаются в формате JSON в кодировке UTF-8. <br/>
+Базовый адрес для отправки запросов: https://paper-scroll.ru/api/{method}
+
+К каждому отправляемому запросу необходимо добавлять заголовок `Authorization` с типом `Basic` и base64-закдированной строкой `merchant_id:access_token` (не пропустите двоеточие между двумя строками).
+
+Например: `Authorization: Basic MjozNTJlYTIyMTZlZDEzYmZhMDlhNTk0ZQ==`
+ 
 ### Limitations
 
 С использованием одного ключа доступа можно отправить не больше 3 запросов в секунду. 
@@ -48,6 +57,7 @@ HOST: https://paper-scroll.ru/api/
 Возвращает информацию о магазинах по их идентификаторам
 
 + Request (application/json)
+
     + Attributes
 
         + merchant_ids (array[number], optional) 
@@ -69,6 +79,7 @@ HOST: https://paper-scroll.ru/api/
 Редактирует информацию о текущем магазине
 
 + Request (application/json)
+
     + Attributes
             
         + name (string, optional) 
@@ -90,13 +101,14 @@ HOST: https://paper-scroll.ru/api/
             
 + Response 200 (application/json)
     + Attributes (object)
-        + response: true (boolean) - Статус выполнения запроса
+        + response: true (boolean) - Результат выполнения запроса
         
     + Body
 
             {
                 "response": true
             }
+
 
 # Users [/users.get]
 
@@ -105,10 +117,11 @@ HOST: https://paper-scroll.ru/api/
 Возвращает информацию о пользователях по их идентификаторам
 
 + Request (application/json)
-    + Attributes
 
-        + user_ids (array[number], optional) 
-            ID пользователей, не больше 100 элементов
+    + Attributes
+        + user_ids (array[number], required) 
+            ID пользователей, не больше 100 элементов.<br/>
+            Если профиль пользователя ещё не был создан в приложении, то объекта с его данными в массиве не будет.
         
     + Body
 
@@ -125,10 +138,9 @@ HOST: https://paper-scroll.ru/api/
 Возвращает информацию о балансах пользователей по их идентификаторам
 
 + Request (application/json)
-    + Attributes
 
-        + user_ids (array[number], optional) 
-            ID пользователей, не больше 250 элементов
+    + Attributes
+        + user_ids (array[number], optional) - ID пользователей, не больше 250 элементов
         
     + Body
 
@@ -141,7 +153,7 @@ HOST: https://paper-scroll.ru/api/
         + response (array[UserBalance])
         
             Список запрошенных балансов пользователей. <br/>
-            Если профиль пользователя ещё не был создан в профиле, то объекта с его данными в массиве не будет.
+            Если профиль пользователя ещё не был создан в приложении, то объекта с его данными в массиве не будет.
 
 
 # Transfers [/transfers]
@@ -151,42 +163,92 @@ HOST: https://paper-scroll.ru/api/
 Запускает выполнение нового перевода
 
 + Request (application/json)
+
     + Attributes
 
-        + user_ids (array[number], optional) 
-            ID пользователей, не больше 100 элементов.
+        + peer_id (number, required) - ID получателя
+        + object_type (enum[string], required) - Тип переводимых предметов
         
+            + Members
+                + `balance` - Рулоны
+                + `disinfectants` - Средства защиты
+                + `items` - Предметы из инвентаря
+        
+        
+        + amount (number) 
+            Переводимая сумма в тыс. долях при **object_type** = **balance** <br/>
+            В остальных случаях - количество переводимых предметов
+
     + Body
 
             {
-                "user_ids": [1]
+                "user_ids": [1],
+                "object_type": "balance",
+                "amount": 1000
             }
             
 + Response 200 (application/json)
     + Attributes (object)
-        + response (array[User]) - Список запрошенных профилей пользователей
+        + response (Transfer) - Объект созданного перевода
+
+## /transfers.get [GET]
+
+Возвращает информацию о переводах по их идентификаторам
+
++ Request (application/json)
+
+    + Attributes
+        + transfer_ids (array[number], required) 
+            ID переводов, не больше 100 элементов.<br/>
+            Если перевод не пренадлежит текущему пользователю или ещё не создан, то объекта с его данными в массиве не будет.
+        
+        + filter (enum[string], optional) - Фильтр 
+            
+            + Default: `all`
+        
+            + Members
+                + `incoming` - Только входящие переводы
+                + `outcoming` - Только исходящие переводы
+        
+    + Body
+
+            {
+                "transfer_ids": [37356]
+            }
+            
++ Response 200 (application/json)
+    + Attributes (object)
+        + response (array[Transfer]) - Список запрошенных переводов
+
+## /transfers.getHistory [GET]
+
+Возвращает информацию о последних переводах
+
++ Request (application/json)
+
+    + Attributes
+        + offset: 0 (number, optional) - Смещение относительно первого найденного перевода
+        
+        + filter: `all` (enum[string], optional) - Фильтр по типу переводов
+            + Default: `all`
+            
+            + Members
+                + `all` - Все переводы
+                + `incoming` - Только входящие переводы
+                + `outcoming` - Только исходящие переводы
+        
+    + Body
+
+            {
+                "transfer_ids": [1]
+            }
+            
++ Response 200 (application/json)
+    + Attributes (object)
+        + response (array[Transfer]) - Список запрошенных переводов
+
 
 # Data Structures
-
-## User (object)
-+ user_id: 595626484 (number, required) 
-    ID пользователя
-    
-+ first_name, last_name: `Pi Emerollo` (string, required) 
-    Имя и Фамилия пользователя
-    
-+ avatar, avatar_max: `https://pp.userapi.com/...` (string, required)
-    Фотографии из профиля пользователя
-    
-+ balance: 100000 (number, required)
-    Баланс пользователя в тыс. долях рулонов
-    
-+ improvements_sum: 1000 (number, required)
-    Сумма улучшений в тыс. долях рулонов
-    
-+ bonuses_sum: 250 (number, required) 
-    Сумма бонусов в тыс. долях
-
 
 ## Merchant (object)
 + merchant_id: `1`, `2`, `3` (number, required)
@@ -210,6 +272,31 @@ HOST: https://paper-scroll.ru/api/
 + create_date: 1590134400 (number, required)
     Дата создания магазина
 
+## User (object)
++ user_id: 595626484 (number, required) 
+    ID пользователя
+    
++ first_name, last_name: `Pi Emerollo` (string, required) 
+    Имя и Фамилия пользователя
+    
++ avatar, avatar_max: `https://pp.userapi.com/...` (string, required)
+    Фотографии из профиля пользователя
+    
++ balance: 100000 (number, required)
+    Баланс пользователя в тыс. долях рулонов
+    
++ improvements_sum: 1000 (number, required)
+    Сумма улучшений в тыс. долях рулонов
+    
++ bonuses_sum: 250 (number, required) 
+    Сумма бонусов в тыс. долях
+
+## UserBalance (object)
++ user_id: 595626484 (number, required)
+    ID пользователя
++ balance: 100000 (number, required)
+    Баланс пользователя в тыс. долях рулонов
+
 ## Transfer (object)
 + transfer_id: 37356 (number, required)
     ID перевода
@@ -221,7 +308,7 @@ HOST: https://paper-scroll.ru/api/
     ID перевода для получателя
 + is_initiator: true (boolean, required)
     Является ли текущий пользователь инициатором
-
+    
 + type (enum[string])
     Тип перевода
 
@@ -247,16 +334,9 @@ HOST: https://paper-scroll.ru/api/
     При **object_type** = **balance** всегда имеет значение `0`
 
 + amount: 1000 (number) 
-
     Переводимая сумма в тыс. долях при **object_type** = **balance** <br/>
     В остальных случаях - количество переводимых предметов
-    
-## UserBalance (object)
-+ user_id: 595626484 (number, required)
-    ID пользователя
-+ balance: 100000 (number, required)
-    Баланс пользователя в тыс. долях рулонов
-    
+
 ## Error (object)
 + error_code: 1 (string, required)
     Код ошибки
