@@ -202,12 +202,12 @@ HOST: https://paper-scroll.ru/api/
                 + `disinfectants` - Средства защиты
                 + `items` - Предметы из инвентаря
                 
-        + object_type_id (number) 
+        + object_type_id (number, optional) 
             При **object_type** = **disinfectants** или **items** содержит ID предмета <br/>
             При **object_type** = **balance** всегда имеет значение `0`
         
         
-        + amount (number) 
+        + amount (number, required) 
             Переводимая сумма в тыс. долях при **object_type** = **balance** <br/>
             В остальных случаях - количество переводимых предметов
 
