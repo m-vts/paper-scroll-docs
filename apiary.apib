@@ -300,7 +300,7 @@ HOST: https://paper-scroll.ru/api/
     + Attributes (object)
         + response (array[Item]) - Список предметов
 
-# Webhooks [/callbacks]
+# Webhooks [/webhooks]
 
 ## /webhooks.get [POST /webhooks.get]
 
@@ -314,7 +314,7 @@ HOST: https://paper-scroll.ru/api/
 
 ## /webhooks.create [POST /webhooks.create]
 
-Создает Callback сервер для отправки уведомлений о событиях 
+Настраивает Webhook для отправки уведомлений о событиях 
 
 + Request (application/json)
 
@@ -328,7 +328,7 @@ HOST: https://paper-scroll.ru/api/
     + Body
 
             {
-                "url": "https://example.com/callback",
+                "url": "https://example.com/webhook",
                 "events": ["transfer_new"]
             }
             
@@ -499,7 +499,7 @@ HOST: https://paper-scroll.ru/api/
     Текущее количество предметов в инвентаре
 
 ## Webhook (object)
-+ callback_id: 1 (number, required)
++ webhook_id: 1 (number, required)
     ID сервера
 + merchant_id: 1 (number, required)
     ID магазина, которым используется сервер
