@@ -65,6 +65,7 @@ HOST: https://paper-scroll.ru/api/
         "peer_id": 100772411,
         "external_id": 37357,
         "is_initiator": false,
+        "payload": 100,
         "type": "merchant",
         "object_type": "balance",
         "object_type_id": 0,
@@ -437,7 +438,9 @@ HOST: https://paper-scroll.ru/api/
     ID перевода для получателя
 + is_initiator: true (boolean, required)
     Является ли текущий пользователь инициатором
-    
++ payload: 0 (number, required)
+    Полезная нагрузка для перевода от пользователя магазину
+
 + type (enum[string], required)
     Тип перевода
 
