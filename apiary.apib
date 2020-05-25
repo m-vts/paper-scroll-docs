@@ -51,7 +51,7 @@ HOST: https://paper-scroll.ru/api/
 
 ### Получение уведомлений
 
-С помощью метода `callbacks.create` вы можете настроить отправку уведомлений о получении новых переводов на собственный сервер.<br/>
+С помощью метода `webhooks.create` вы можете настроить отправку уведомлений о событиях в игре на собственный сервер.<br/>
 Данные отправляются методом `POST` в формате `application/json`.
 
 На данный момент поддерживаются события: `transfer_new`.
@@ -278,9 +278,41 @@ HOST: https://paper-scroll.ru/api/
         + response (array[Transfer]) - Список запрошенных переводов
 
 
-# Callbacks [/callbacks]
+# Storage [/storage]
 
-## /callbacks.create [POST /callbacks.create]
+## /storage.getDisinfectants [POST /storage.getDisinfectants]
+
+Возвращает информацию об имеющихся средствах защиты в инвентаре
+
++ Request (application/json)
+
++ Response 200 (application/json)
+    + Attributes (object)
+        + response (array[Disinfectant]) - Список средств защиты
+
+## /storage.getItems [POST /storage.getItems]
+
+Возвращает информацию об имеющихся предметах в инвентаре
+
++ Request (application/json)
+
++ Response 200 (application/json)
+    + Attributes (object)
+        + response (array[Item]) - Список предметов
+
+# Webhooks [/callbacks]
+
+## /webhooks.get [POST /webhooks.get]
+
+Возвращает информацию о текущем установленном сервере или ошибку при его отсутствии
+
++ Request (application/json)
+            
++ Response 200 (application/json)
+    + Attributes (object)
+        + response (Webhook) - Объект сервера
+
+## /webhooks.create [POST /webhooks.create]
 
 Создает Callback сервер для отправки уведомлений о событиях 
 
@@ -302,9 +334,9 @@ HOST: https://paper-scroll.ru/api/
             
 + Response 200 (application/json)
     + Attributes (object)
-        + response (Callback) - Объект созданного сервера
+        + response (Webhook) - Объект созданного сервера
 
-## /callbacks.delete [POST /callbacks.delete]
+## /webhooks.delete [POST /webhooks.delete]
 
 Удялает текущий используемый сервер 
 
@@ -320,7 +352,7 @@ HOST: https://paper-scroll.ru/api/
                 "response": true
             }
 
-## /callbacks.getLogs [POST /callbacks.getLogs]
+## /webhooks.getLogs [POST /webhooks.getLogs]
 
 Возвращает информацию о последних 20 ошибках при отправке событий
 
@@ -338,7 +370,6 @@ HOST: https://paper-scroll.ru/api/
                     "22.05.2019 11:44:22 — 404 Not found"
                 ]
             }
-  
 
 
 # Data Structures
@@ -439,7 +470,35 @@ HOST: https://paper-scroll.ru/api/
 + create_date: 1590134400 (number, required)
     Дата отправки перевода
 
-## Callback (object)
+## Disinfectant (object)
++ type_id: 1 (number, required)
+    ID типа средства защиты
++ name: `Маска` (string, required)
+    Название средства защиты
++ protection: `infection` (string, required)
+    Тип защиты (`infection` или `steal`)
++ cost: 1000000 (number, required)
+    Стоимость предмета в тыс. долях рулонов
++ life_time: 14400 (number, required)
+    Время действия средства защиты в секундах
++ chance_reduction: 30 (number, required)
+    Количество снижаемых процентов для вероятности возникновения события
++ current_count: 2 (number, required)
+    Текущее количество средств защиты в инвентаре
+
+## Item (object) 
++ type_id: 1 (number, required)
+    ID типа предмета
++ name: `Тест на вирус` (string, required)
+    Название предмета
++ description: `Позволяет точно узнать свой статус заболевания` (string, required)
+    Описание предмета
++ cost: 5000000 (number, required)
+    Стоимость предмета в тыс. долях рулонов
++ current_count: 3 (number, required)
+    Текущее количество предметов в инвентаре
+
+## Webhook (object)
 + callback_id: 1 (number, required)
     ID сервера
 + merchant_id: 1 (number, required)
