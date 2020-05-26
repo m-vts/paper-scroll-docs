@@ -61,9 +61,9 @@ HOST: https://paper-scroll.ru/api/
     "type": "transfer_new",
     "object": {
         "transfer_id": 37356,
+        "external_id": 37357,
         "owner_id": -1,
         "peer_id": 100772411,
-        "external_id": 37357,
         "is_initiator": false,
         "payload": 100,
         "type": "transfer",
@@ -421,12 +421,12 @@ HOST: https://paper-scroll.ru/api/
 ## Transfer (object)
 + transfer_id: 37356 (number, required)
     ID перевода
++ external_id: 37357 (number, required)
+    ID перевода для получателя
 + owner_id: 595626484 (number, required)
     ID инициатора перевода
 + peer_id: 100772411 (number, required)
     ID получателя перевода
-+ external_id: 37357 (number, required)
-    ID перевода для получателя
 + is_initiator: true (boolean, required)
     Является ли текущий пользователь инициатором
 + payload: 0 (number, required)
