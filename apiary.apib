@@ -9,15 +9,21 @@ HOST: https://paper-scroll.ru/api/
 
 Для отправки запросов вам необходимо создать магазин внутри приложения и получить к нему ключ доступа по ссылке [vk.com/app7420483#create_merchant](https://vk.com/app7420483#create_merchant)
 
+### SDK
+
+Информацию о готовых SDK можно найти по ссылкам: <br/>
+Node.JS: https://paper-scroll.ru/api/ <br/>
+Python: https://paper-scroll.ru/api/ <br/>
+
 ### Отправка запросов
 
 Данные запросов и ответов передаются в формате JSON в кодировке UTF-8. <br/>
-Базовый адрес для отправки запросов: https://paper-scroll.ru/api/{method}
+Базовый адрес для отправки запросов: [https://paper-scroll.ru/api/{method}](https://paper-scroll.ru/api/)
 
 К каждому отправляемому запросу необходимо добавлять заголовок `Authorization` с типом `Basic` и base64-закодированной строкой `merchant_id:access_token` (не пропустите двоеточие между двумя строками).
 
 Например: `Authorization: Basic MjozNTJlYTIyMTZlZDEzYmZhMDlhNTk0ZQ==`
- 
+
 ### Лимиты
 
 С использованием одного ключа доступа можно отправить не больше 3 запросов в секунду. 
@@ -290,6 +296,7 @@ HOST: https://paper-scroll.ru/api/
 + Response 200 (application/json)
     + Attributes (object)
         + response (array[Item]) - Список предметов
+
 
 # Webhooks [/webhooks]
 
