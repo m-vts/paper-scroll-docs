@@ -15,6 +15,48 @@ HOST: https://paper-scroll.ru/api/
 Node.JS: [github.com/KotRikD/paper-scroll-sdk-node](https://github.com/KotRikD/paper-scroll-sdk-node) <br/>
 Python: [github.com/KotRikD/paper-scroll-sdk-py](https://github.com/KotRikD/paper-scroll-sdk-py) <br/>
 
+### Генерация ссылок
+
+Приложение поддерживает быстрые ссылки, открывающие окно перевода вашему магазину.
+
+Ссылка состоит из нескольких параметров: `vk.com/app7420483#m{merchant_id}_{amount}_{payload}_{is_locked}`
+
+- merchant_id: Идентификатор вашего магазина
+- amount: Предлагаемая сумма перевода в тыс. долях рулонов
+- payload: Полезная нагрузка в переводе
+- is_locked: Флаг, запрещающий редактирование предложенной суммы
+
+Пример такой ссылки: [vk.com/app7420483#m1_1000000_50_0](https://vk.com/app7420483#m1_1000000_50_0)
+
+### Получение уведомлений
+
+С помощью метода `webhooks.create` вы можете настроить отправку уведомлений о событиях в игре на собственный сервер. Данные отправляются методом `POST` в формате `application/json`.
+
+На данный момент поддерживаются события: `transfer_new`.
+
+Пример отправляемого события:
+```
+{
+    "type": "transfer_new",
+    "object": {
+        "transfer_id": 37356,
+        "external_id": 37357,
+        "owner_id": -1,
+        "peer_id": 100772411,
+        "is_initiator": false,
+        "payload": 100,
+        "type": "transfer",
+        "object_type": "balance",
+        "object_type_id": 0,
+        "amount": 1000,
+        "create_date": 1590134400
+    },
+    "secret": "yQ7Z1LDDG83Q8r8Ym9Yu2aXzBc51T06Q"
+}
+```
+
+Событие считается успешно отправленным, если ответ сервера содержит HTTP код `200 OK`.
+
 ### Отправка запросов
 
 Данные запросов и ответов передаются в формате JSON в кодировке UTF-8. <br/>
@@ -55,47 +97,6 @@ Python: [github.com/KotRikD/paper-scroll-sdk-py](https://github.com/KotRikD/pape
 
 Также в ходе выполнения запроса могут произойти специальные ошибки, уникальные для каждого метода.
 
-### Получение уведомлений
-
-С помощью метода `webhooks.create` вы можете настроить отправку уведомлений о событиях в игре на собственный сервер. Данные отправляются методом `POST` в формате `application/json`.
-
-На данный момент поддерживаются события: `transfer_new`.
-
-Пример отправляемого события:
-```
-{
-    "type": "transfer_new",
-    "object": {
-        "transfer_id": 37356,
-        "external_id": 37357,
-        "owner_id": -1,
-        "peer_id": 100772411,
-        "is_initiator": false,
-        "payload": 100,
-        "type": "transfer",
-        "object_type": "balance",
-        "object_type_id": 0,
-        "amount": 1000,
-        "create_date": 1590134400
-    },
-    "secret": "yQ7Z1LDDG83Q8r8Ym9Yu2aXzBc51T06Q"
-}
-```
-
-Событие считается успешно отправленным, если ответ сервера содержит HTTP код `200 OK`.
-
-### Генерация ссылок
-
-Приложение поддерживает быстрые ссылки, открывающие окно перевода вашему магазину.
-
-Ссылка состоит из нескольких параметров: `vk.com/app7420483#m{merchant_id}_{amount}_{payload}_{is_locked}`
-
-- merchant_id: Идентификатор вашего магазина
-- amount: Предлагаемая сумма перевода в тыс. долях рулонов
-- payload: Полезная нагрузка в переводе
-- is_locked: Флаг, запрещающий редактирование предложенной суммы
-
-Примерт такой ссылки: [vk.com/app7420483#m1_1000000_50_0](https://vk.com/app7420483#m1_1000000_50_0)
 
 # Merchants [/merchants]
 
