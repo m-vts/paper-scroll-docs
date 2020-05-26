@@ -12,8 +12,8 @@ HOST: https://paper-scroll.ru/api/
 ### SDK
 
 Информацию о готовых SDK можно найти по ссылкам: <br/>
-Node.JS: https://paper-scroll.ru/api/ <br/>
-Python: https://paper-scroll.ru/api/ <br/>
+Node.JS: [github.com/KotRikD/paper-scroll-sdk-node ](https://github.com/KotRikD/paper-scroll-sdk-node) <br/>
+Python: [github.com/KotRikD/paper-scroll-sdk-py](https://github.com/KotRikD/paper-scroll-sdk-py) <br/>
 
 ### Отправка запросов
 
@@ -53,7 +53,7 @@ Python: https://paper-scroll.ru/api/ <br/>
 - **#5 - Unknown method** (Не определена секция/метод API)
 - **#6 - Invalid params** <br/> (Неверно переданы параметры к запросу.<br/>Возвращается, если для метода не опредлены собственные типы ошибок.)
 
-Также в ходе выполнения могут произойти специальные ошибки, уникальные для каждого запрашиваемого метода.
+Также в ходе выполнения запроса могут произойти специальные ошибки, уникальные для каждого метода.
 
 ### Получение уведомлений
 
@@ -83,7 +83,7 @@ Python: https://paper-scroll.ru/api/ <br/>
 ```
 
 Событие считается успешно отправленным, если ответ сервера содержит HTTP код `200 OK`.<br/>
-При ошибке событие будет отправлено на сервер ещё раз через 30 секунд.
+При ошибке событие будет отправлено на сервер ещё раз через 10 секунд.
 
 
 # Merchants [/merchants]
