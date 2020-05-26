@@ -5,7 +5,7 @@ HOST: https://paper-scroll.ru/api/
 
 Здесь представлен список доступных секций и методов API игры [Paper Scroll](https://vk.com/app7420483).
 
-Любые вопросы о работе API вы можете задать в нашем [сообществе разработчиков ВКонтакте](https://vk.com/dev_paper_scroll) или [специальной беседе](https://vk.me/join/AJQ1dzQ/0RfNI_Gu9q_EIpge).
+Любые вопросы о работе API вы можете задать в нашем [сообществе для разработчиков ВКонтакте](https://vk.com/dev_paper_scroll) или [специальной беседе](https://vk.me/join/AJQ1dzQ/0RfNI_Gu9q_EIpge).
 
 Для отправки запросов вам необходимо создать магазин внутри приложения и получить к нему ключ доступа по ссылке [vk.com/app7420483#create_merchant](https://vk.com/app7420483#create_merchant)
 
@@ -61,12 +61,12 @@ HOST: https://paper-scroll.ru/api/
     "type": "transfer_new",
     "object": {
         "transfer_id": 37356,
-        "user_id": 595626484,
+        "owner_id": -1,
         "peer_id": 100772411,
         "external_id": 37357,
         "is_initiator": false,
         "payload": 100,
-        "type": "merchant",
+        "type": "transfer",
         "object_type": "balance",
         "object_type_id": 0,
         "amount": 1000,
@@ -253,17 +253,8 @@ HOST: https://paper-scroll.ru/api/
 + Request (application/json)
 
     + Attributes
-        + filter: `all` (enum[string], optional) - Фильтр по типу переводов
-            + Default: `all`
-            
-            + Members
-                + `all` - Все переводы
-                + `incoming` - Только входящие переводы
-                + `outcoming` - Только исходящие переводы
-                
         + offset: 0 (number, optional) - Смещение относительно первого найденного перевода
-        
-        + limit: 100 (number, optional) - Количество возвращаемых переводов, не больше 250 элементов.
+        + limit: 100 (number, optional) - Количество возвращаемых переводов, не больше 250 элементов
         
     + Body
 
@@ -430,7 +421,7 @@ HOST: https://paper-scroll.ru/api/
 ## Transfer (object)
 + transfer_id: 37356 (number, required)
     ID перевода
-+ user_id: 595626484 (number, required)
++ owner_id: 595626484 (number, required)
     ID инициатора перевода
 + peer_id: 100772411 (number, required)
     ID получателя перевода
@@ -439,15 +430,14 @@ HOST: https://paper-scroll.ru/api/
 + is_initiator: true (boolean, required)
     Является ли текущий пользователь инициатором
 + payload: 0 (number, required)
-    Полезная нагрузка для перевода от пользователя магазину
+    Полезная нагрузка при переводе от пользователя магазину
 
 + type (enum[string], required)
     Тип перевода
 
     + Default: `transfer`
     + Members
-        + `merchant` - Перевод от/в магазин
-        + `transfer` - Стандартный перевод между пользователями (user-only)
+        + `transfer` - Перевод между пользователями или пользователем и магазином
         + `steal` - Кража другим пользователем (user-only)
         + `loss` - Потеря от заражения (user-only)
         + `achievement` - Бонус за полученное достижение (user-only)
